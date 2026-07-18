@@ -17,6 +17,7 @@ env/
 .env/
 
 # Jupyter
+*.ipynb
 .ipynb_checkpoints/
 
 # Local / runtime artifacts
