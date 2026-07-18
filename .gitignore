@@ -1,0 +1,52 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.eggs/
+dist/
+build/
+*.egg
+
+# Virtual environments
+venv/
+.venv/
+env/
+.env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Local / runtime artifacts
+.render_cache/
+render_output/
+logs/
+images/
+*.log
+*.snoop
+*.bin
+
+# Generated previews / outputs
+output.png
+page_*_print.png
+
+# Secrets / local env
+.env
+.env.*
+!.env.example
+*.pem
+credentials.json
+
+# Editors / OS
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Docker
+*.tar

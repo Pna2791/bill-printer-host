@@ -1,0 +1,48 @@
+# Physical printer geometry. Width must be byte-aligned.
+printer_width: 384
+printer_dpi: 203
+
+# PDFs are rasterized at 600 DPI (the supported maximum), cropped at full
+# resolution, then reduced once with LANCZOS to the printer's 203 DPI width.
+render_dpi: 600
+
+crop_margin: 4
+content_safety_margin: 2
+white_threshold: 248
+rotation_mode: auto
+paper_trim: true
+minimum_page_rows: 1
+
+# "auto" evaluates every candidate and records all scores in report.json.
+threshold_algorithm: auto
+threshold_candidates:
+  - otsu
+  - adaptive
+  - sauvola
+  - niblack
+  - wolf
+
+dither_algorithm: auto
+dither_candidates:
+  - none
+  - floyd_steinberg
+  - jarvis
+  - stucki
+  - atkinson
+  - bayer
+
+save_intermediates: true
+cache_dir: .render_cache
+output_dir: render_output
+
+enhancement:
+  auto_contrast: true
+  clahe: true
+  clahe_clip_limit: 2.0
+  clahe_grid_size: 8
+  gamma: auto
+  gamma_candidates: [0.75, 0.9, 1.0, 1.1, 1.25]
+  contrast: 1.0
+  sharpness: 1.0
+  denoise_strength: 3
+  morphological_cleanup: true

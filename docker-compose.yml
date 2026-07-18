@@ -1,0 +1,26 @@
+services:
+  mxw01:
+    build: .
+    container_name: mxw01-print-server
+    restart: unless-stopped
+    # BLE is accessed through the host's bluetoothd over D-Bus, so the
+    # container must share the host D-Bus socket. Host networking keeps the
+    # health endpoint reachable and avoids NAT for local clients.
+    network_mode: host
+    # Ubuntu's default docker AppArmor profile denies D-Bus AddMatch calls,
+    # which Bleak needs. Verified experimentally: without this, connects fail
+    # with org.freedesktop.DBus.Error.AccessDenied.
+    security_opt:
+      - apparmor=unconfined
+    volumes:
+      - /var/run/dbus:/var/run/dbus:ro
+      - ./render_output:/app/render_output
+      - render-cache:/app/.render_cache
+    environment:
+      MXW01_ADDRESS: "48:0F:57:49:DB:3B"
+      MXW01_INTENSITY: "0x5D"
+      RENDER_CONFIG: "/app/rendering.yaml"
+      PORT: "8080"
+
+volumes:
+  render-cache:

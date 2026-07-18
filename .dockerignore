@@ -1,0 +1,12 @@
+venv/
+__pycache__/
+logs/
+docs/
+*.log
+*.snoop
+.dockerignore
+Dockerfile
+docker-compose.yml
+gatt_discover.py
+safe_writes.py
+print_test.py

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MXW01 Print</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="page">
+    <header class="hero">
+      <p class="brand">MXW01</p>
+      <h1>Thermal print</h1>
+      <p class="lede">Drop a PDF. Its first page is thresholded, cropped, and resized for the printer.</p>
+      <div class="status-row" id="printer-status" aria-live="polite">
+        <span class="dot" data-state="unknown"></span>
+        <span id="status-text">Checking printer…</span>
+      </div>
+    </header>
+
+    <main>
+      <section class="upload" id="dropzone" tabindex="0" aria-label="PDF upload area">
+        <input id="file-input" type="file" accept="application/pdf,.pdf" hidden />
+        <div class="upload-inner">
+          <p class="upload-title">Upload PDF</p>
+          <p class="upload-hint">Drag and drop, or click to browse</p>
+          <p class="upload-meta" id="file-meta">PDF only · first page is printed</p>
+        </div>
+        <button type="button" class="btn primary" id="browse-btn">Choose file</button>
+      </section>
+
+      <section class="panel" id="selected" hidden>
+        <div class="selected-row">
+          <div>
+            <p class="label">Selected</p>
+            <p class="filename" id="filename">—</p>
+            <p class="filesize" id="filesize"></p>
+          </div>
+          <button type="button" class="btn ghost" id="clear-btn">Clear</button>
+        </div>
+        <label class="field">
+          <span>Print intensity</span>
+          <input id="intensity" type="number" min="0" max="255" value="93" />
+        </label>
+        <button type="button" class="btn primary wide" id="preview-btn">Render preview</button>
+        <p class="feedback" id="feedback" role="status"></p>
+      </section>
+
+      <section class="panel" id="preview" hidden>
+        <div class="panel-head">
+          <h2>Preview</h2>
+          <label class="stage-select">
+            <span>Stage</span>
+            <select id="stage">
+              <option value="09_final" selected>Final (as printed)</option>
+              <option value="03_cropped">Cropped</option>
+              <option value="07_threshold">Threshold</option>
+              <option value="01_original">Original</option>
+            </select>
+          </label>
+        </div>
+        <p class="preview-hint">Check the preview before printing. This is exactly what will be sent to the printer.</p>
+        <div id="preview-pages" class="preview-pages"></div>
+        <div class="preview-actions">
+          <button type="button" class="btn ghost" id="rerender-btn">Re-render</button>
+          <button type="button" class="btn primary" id="print-btn">Looks good — print</button>
+        </div>
+        <p class="feedback" id="print-feedback" role="status"></p>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Queue</h2>
+          <button type="button" class="btn ghost" id="refresh-btn">Refresh</button>
+        </div>
+        <div id="queue" class="queue">
+          <p class="empty">No jobs yet.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="/static/app.js"></script>
+</body>
+</html>
