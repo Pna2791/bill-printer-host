@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>MXW01 Print</title>
-  <link rel="stylesheet" href="/static/styles.css" />
+  <link rel="stylesheet" href="/static/styles.css?v=3" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -14,7 +14,7 @@
     <header class="hero">
       <p class="brand">MXW01</p>
       <h1>Thermal print</h1>
-      <p class="lede">Drop a PDF. Its first page is thresholded, cropped, and resized for the printer.</p>
+      <p class="lede">Print text, an image, or a PDF. Content is rasterized to 384 px for the MXW01.</p>
       <div class="status-row" id="printer-status" aria-live="polite">
         <span class="dot" data-state="unknown"></span>
         <span id="status-text">Checking printer…</span>
@@ -22,53 +22,125 @@
     </header>
 
     <main>
-      <section class="upload" id="dropzone" tabindex="0" aria-label="PDF upload area">
-        <input id="file-input" type="file" accept="application/pdf,.pdf" hidden />
-        <div class="upload-inner">
-          <p class="upload-title">Upload PDF</p>
-          <p class="upload-hint">Drag and drop, or click to browse</p>
-          <p class="upload-meta" id="file-meta">PDF only · first page is printed</p>
-        </div>
-        <button type="button" class="btn primary" id="browse-btn">Choose file</button>
-      </section>
+      <div class="mode-tabs" role="tablist" aria-label="Print mode">
+        <button type="button" class="mode-tab active" role="tab" id="tab-text" data-mode="text" aria-selected="true" aria-controls="panel-text">Text</button>
+        <button type="button" class="mode-tab" role="tab" id="tab-image" data-mode="image" aria-selected="false" aria-controls="panel-image">Image</button>
+        <button type="button" class="mode-tab" role="tab" id="tab-pdf" data-mode="pdf" aria-selected="false" aria-controls="panel-pdf">PDF</button>
+      </div>
 
-      <section class="panel" id="selected" hidden>
-        <div class="selected-row">
-          <div>
-            <p class="label">Selected</p>
-            <p class="filename" id="filename">—</p>
-            <p class="filesize" id="filesize"></p>
-          </div>
-          <button type="button" class="btn ghost" id="clear-btn">Clear</button>
-        </div>
+      <label class="field intensity-field">
+        <span>Print intensity</span>
+        <input id="intensity" type="number" min="0" max="255" value="93" />
+      </label>
+
+      <section class="panel mode-panel" id="panel-text" role="tabpanel" aria-labelledby="tab-text">
+        <h2>Type to print</h2>
+        <p class="preview-hint">Type anything below, then print. Text is rasterized for the thermal printer.</p>
         <label class="field">
-          <span>Print intensity</span>
-          <input id="intensity" type="number" min="0" max="255" value="93" />
+          <span>Your text</span>
+          <textarea id="text-input" rows="8" placeholder="Type here…&#10;&#10;Hello from MXW01" autofocus></textarea>
         </label>
-        <button type="button" class="btn primary wide" id="preview-btn">Render preview</button>
-        <p class="feedback" id="feedback" role="status"></p>
-      </section>
-
-      <section class="panel" id="preview" hidden>
-        <div class="panel-head">
-          <h2>Preview</h2>
-          <label class="stage-select">
-            <span>Stage</span>
-            <select id="stage">
-              <option value="09_final" selected>Final (as printed)</option>
-              <option value="03_cropped">Cropped</option>
-              <option value="07_threshold">Threshold</option>
-              <option value="01_original">Original</option>
+        <div class="field-row">
+          <label class="field">
+            <span>Font size</span>
+            <input id="font-size" type="number" min="8" max="128" value="32" />
+          </label>
+          <label class="field">
+            <span>Align</span>
+            <select id="text-align">
+              <option value="left" selected>Left</option>
+              <option value="center">Center</option>
+              <option value="right">Right</option>
             </select>
           </label>
         </div>
-        <p class="preview-hint">Check the preview before printing. This is exactly what will be sent to the printer.</p>
-        <div id="preview-pages" class="preview-pages"></div>
-        <div class="preview-actions">
-          <button type="button" class="btn ghost" id="rerender-btn">Re-render</button>
-          <button type="button" class="btn primary" id="print-btn">Looks good — print</button>
+        <button type="button" class="btn primary wide" id="text-preview-btn">Preview text</button>
+        <p class="feedback" id="text-feedback" role="status"></p>
+        <section id="text-preview-section" hidden>
+          <p class="preview-hint">This is how the text will be laid out on the 384-pixel paper.</p>
+          <figure class="preview-page text-preview">
+            <img id="text-preview-image" alt="Preview of text as printed" />
+          </figure>
+          <div class="preview-actions">
+            <button type="button" class="btn ghost" id="text-edit-btn">Edit</button>
+            <button type="button" class="btn primary" id="text-print-btn">Looks good — print</button>
+          </div>
+        </section>
+      </section>
+
+      <section class="mode-panel" id="panel-image" role="tabpanel" aria-labelledby="tab-image" hidden>
+        <div class="upload" id="image-dropzone" tabindex="0" aria-label="Image upload area">
+          <input id="image-input" type="file" accept="image/*,.png,.jpg,.jpeg,.webp,.gif" hidden />
+          <div class="upload-inner">
+            <p class="upload-title">Upload image</p>
+            <p class="upload-hint">Drag and drop, or click to browse</p>
+            <p class="upload-meta" id="image-meta">PNG, JPEG, WebP, or GIF</p>
+          </div>
+          <button type="button" class="btn primary" id="image-browse-btn">Choose file</button>
         </div>
-        <p class="feedback" id="print-feedback" role="status"></p>
+
+        <section class="panel" id="image-selected" hidden>
+          <div class="selected-row">
+            <div>
+              <p class="label">Selected</p>
+              <p class="filename" id="image-filename">—</p>
+              <p class="filesize" id="image-filesize"></p>
+            </div>
+            <button type="button" class="btn ghost" id="image-clear-btn">Clear</button>
+          </div>
+          <figure class="image-preview" id="image-preview-wrap" hidden>
+            <img id="image-preview" alt="Selected image preview" />
+          </figure>
+          <button type="button" class="btn primary wide" id="image-print-btn">Print image</button>
+          <p class="feedback" id="image-feedback" role="status"></p>
+        </section>
+      </section>
+
+      <section class="mode-panel" id="panel-pdf" role="tabpanel" aria-labelledby="tab-pdf" hidden>
+        <div class="upload" id="dropzone" tabindex="0" aria-label="PDF upload area">
+          <input id="file-input" type="file" accept="application/pdf,.pdf" hidden />
+          <div class="upload-inner">
+            <p class="upload-title">Upload PDF</p>
+            <p class="upload-hint">Drag and drop, or click to browse</p>
+            <p class="upload-meta" id="file-meta">PDF only · first page is printed</p>
+          </div>
+          <button type="button" class="btn primary" id="browse-btn">Choose file</button>
+        </div>
+
+        <section class="panel" id="selected" hidden>
+          <div class="selected-row">
+            <div>
+              <p class="label">Selected</p>
+              <p class="filename" id="filename">—</p>
+              <p class="filesize" id="filesize"></p>
+            </div>
+            <button type="button" class="btn ghost" id="clear-btn">Clear</button>
+          </div>
+          <button type="button" class="btn primary wide" id="preview-btn">Render preview</button>
+          <p class="feedback" id="feedback" role="status"></p>
+        </section>
+
+        <section class="panel" id="preview" hidden>
+          <div class="panel-head">
+            <h2>Preview</h2>
+            <label class="stage-select">
+              <span>Stage</span>
+              <select id="stage">
+                <option value="09_final" selected>Final (as printed)</option>
+                <option value="03_cropped">Cropped</option>
+                <option value="07_threshold">Threshold</option>
+                <option value="01_original">Original</option>
+              </select>
+            </label>
+          </div>
+          <p class="preview-hint">Check the preview before printing. This is exactly what will be sent to the printer.</p>
+          <div id="preview-pages" class="preview-pages"></div>
+          <div class="preview-actions">
+            <button type="button" class="btn ghost" id="rerender-btn">Re-render</button>
+            <button type="button" class="btn primary" id="print-btn">Looks good — print</button>
+          </div>
+          <p class="feedback" id="print-feedback" role="status"></p>
+        </section>
       </section>
 
       <section class="panel">
@@ -82,6 +154,6 @@
       </section>
     </main>
   </div>
-  <script src="/static/app.js"></script>
+  <script src="/static/app.js?v=3"></script>
 </body>
 </html>

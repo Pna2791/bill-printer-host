@@ -21,6 +21,7 @@ import asyncio
 import logging
 import os
 import uuid
+from io import BytesIO
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -29,13 +30,13 @@ from pathlib import Path
 from typing import Any, Optional
 
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from pipeline import PipelineResult
 from preprocess_pdf import NotebookPDFPipeline
-from printer import MXW01
+from printer import MXW01, render_text
 from render_config import PipelineConfig
 
 logging.basicConfig(
@@ -326,6 +327,30 @@ async def print_text(body: TextBody):
         return {"queued": False, "ok": True}
     except Exception as e:
         raise HTTPException(500, str(e)) from e
+
+
+@app.post("/render/text")
+async def render_text_preview(body: TextBody):
+    """Render text exactly as the printer path does, without printing it."""
+    if not body.text.strip():
+        raise HTTPException(400, "text must not be empty")
+    try:
+        image = render_text(
+            body.text,
+            width=printer.width,
+            minimum_rows=printer.minimum_rows,
+            font_size=body.font_size,
+            align=body.align,
+        )
+        output = BytesIO()
+        image.save(output, format="PNG")
+        return Response(
+            content=output.getvalue(),
+            media_type="image/png",
+            headers={"Cache-Control": "no-store"},
+        )
+    except Exception as e:
+        raise HTTPException(400, str(e)) from e
 
 
 @app.post("/print/qrcode")

@@ -12,7 +12,7 @@ Environment:
 ## Endpoints
 
 ### `GET /`
-Browser UI for PDF upload, printer status, and queue monitoring.
+Browser UI for text, image, and PDF upload, printer status, and queue monitoring.
 Static assets are served from `/static/`.
 
 ### `GET /health`
@@ -30,6 +30,12 @@ Queries A1 (and B1 once) over BLE. Returns battery, temperature, firmware.
 {"text": "Hello", "font_size": 32, "align": "left", "intensity": 93, "queue": false}
 ```
 If `queue` is true the job is enqueued and the response contains the job id.
+
+### `POST /render/text`
+Accepts the same JSON body as `/print/text` and returns an `image/png` preview
+rendered with the same font, wrapping, alignment, and 384-pixel width used by
+the printer. It does not enqueue or print anything. The web UI uses this
+preview before enabling print confirmation.
 
 ### `POST /print/qrcode`
 ```json
@@ -95,7 +101,8 @@ are reused — no re-rendering. Optional `intensity` form field overrides the on
 given at render time. Renders are held in memory; after a server restart the
 render must be created again.
 
-The web UI at `/` uses this flow: upload → render preview → confirm print.
+The web UI at `/` supports text and image print directly, and for PDFs uses
+upload → render preview → confirm print.
 
 ### `POST /queue`
 Generic enqueue. Body must include `kind` ∈ `text|image|qrcode|pdf` plus the

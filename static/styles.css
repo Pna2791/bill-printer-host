@@ -75,6 +75,85 @@ h1 {
   font-size: 0.82rem;
 }
 
+.mode-tabs {
+  display: flex;
+  gap: 0.35rem;
+  margin-bottom: 1rem;
+  padding: 0.3rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel);
+}
+
+.mode-tab {
+  flex: 1;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 0.55rem 0.9rem;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.mode-tab.active,
+.mode-tab[aria-selected="true"] {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.intensity-field {
+  margin: 0 0 1rem;
+}
+
+.mode-panel {
+  margin-bottom: 1rem;
+}
+
+.mode-panel > .upload {
+  margin-bottom: 1rem;
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+}
+
+.field textarea,
+.field select {
+  width: 100%;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fffdf8;
+  font: inherit;
+  resize: vertical;
+}
+
+.field select {
+  width: auto;
+  min-width: 8rem;
+}
+
+.image-preview {
+  margin: 0 0 1rem;
+  padding: 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fbf7ee;
+  text-align: center;
+}
+
+.image-preview img {
+  max-width: min(384px, 100%);
+  max-height: 320px;
+  object-fit: contain;
+  background: #fff;
+  border: 1px solid var(--line);
+}
+
 .dot {
   width: 0.55rem;
   height: 0.55rem;
@@ -309,4 +388,5 @@ h1 {
 @media (max-width: 560px) {
   .page { width: min(100% - 1.25rem, 720px); padding-top: 1.5rem; }
   .selected-row, .panel-head, .job-top { align-items: flex-start; flex-direction: column; }
+  .field-row { grid-template-columns: 1fr; }
 }

@@ -40,7 +40,7 @@ docker compose up -d --build
 curl localhost:8080/health
 ```
 
-Open the upload UI at http://localhost:8080/
+Open the UI at http://localhost:8080/ (text, image, or PDF print).
 
 The container talks to the printer through the **host's** bluetoothd, so it
 needs three things (already in `docker-compose.yml`):
